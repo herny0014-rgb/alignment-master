@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alignment Master v16 - A801 / A804</title>
+<style>
+:root{
+  --bg:#edf3f8;--card:#fff;--text:#10233b;--muted:#68758a;--line:#d8e2ec;
+  --primary:#195b9f;--primary2:#0f477e;--ok:#157443;--warn:#9a5b00;--bad:#b42318;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;color:var(--text)}
+.app{max-width:580px;margin:0 auto;min-height:100vh;background:#f5f8fb}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--primary),var(--primary2));color:#fff;padding:17px 18px}
+header h1{font-size:23px;margin:0} header p{font-size:12px;margin:4px 0 0;opacity:.92}
+main{padding:14px}
+.card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:13px;box-shadow:0 2px 10px rgba(16,24,40,.06)}
+h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:16px 0 8px}
+.small{font-size:12px;color:var(--muted);line-height:1.55}
+.note,.okbox,.warnbox{border-radius:12px;padding:11px 12px;font-size:12px;line-height:1.6;margin-top:10px}
+.note{background:#f7fbff;border:1px solid #d7e7f7}.okbox{background:#eaf7ef;border:1px solid #b8e0c7;color:#155c39}
+.warnbox{background:#fff5e8;border:1px solid #efd2a8;color:#764500}
+label{display:block;font-size:13px;font-weight:850;margin:10px 0 6px}
+input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;font-size:17px;background:#fff}
+input:focus{outline:2px solid #bed4ea;border-color:var(--primary)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.readonly{background:#f4f6f8;color:#475467}
+.btns{display:flex;gap:9px;margin-top:14px}
+button{flex:1;border:0;border-radius:12px;padding:13px;font-size:14px;font-weight:900;cursor:pointer}
+.primary{background:var(--primary);color:#fff}.secondary{background:#e7edf5;color:#26374e}
+.hidden{display:none}
+.menu{display:flex;align-items:center;justify-content:space-between;border:1px solid #dce5ee;border-radius:14px;padding:15px;background:#fbfdff;margin-top:10px}
+.menu b{font-size:17px}.menu span{font-size:12px;color:#667085}
+.dial{width:215px;height:215px;border:6px solid #26364a;border-radius:50%;margin:12px auto;position:relative;background:#fff}
+.dial:before,.dial:after{content:"";position:absolute;background:#c9d2dc}.dial:before{left:50%;top:8%;bottom:8%;width:1px}.dial:after{top:50%;left:8%;right:8%;height:1px}
+.pos{position:absolute;font-weight:900}.p12{top:10px;left:50%;transform:translateX(-50%)}.p3{right:12px;top:50%;transform:translateY(-50%)}.p6{bottom:10px;left:50%;transform:translateX(-50%)}.p9{left:12px;top:50%;transform:translateY(-50%)}
+.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;font-size:12px;color:#667085;font-weight:800}
+.base-diagram{border:1px solid #dce6f0;border-radius:14px;padding:13px;background:#fbfdff}
+.dir{display:flex;justify-content:space-between;font-size:12px;font-weight:900;margin-bottom:8px}
+.brow{display:grid;grid-template-columns:1fr 64px 1fr;gap:8px;align-items:center;margin:8px 0}
+.base{border:2px solid #9fb9d5;border-radius:12px;padding:11px;text-align:center;font-weight:900;background:#f8fbff}
+.base small{display:block;font-size:10px;color:#667085}.mid{text-align:center;font-size:11px;color:#667085}
+.constants{display:grid;grid-template-columns:1fr 1fr;gap:8px}.const{border:1px solid #dfe7ef;border-radius:12px;padding:10px;background:#fafcff}
+.const b{font-size:11px}.const div{font-size:18px;font-weight:900;margin-top:4px}
+.result{border:1px solid #dfe7ef;border-radius:13px;padding:12px;margin:8px 0;background:#fafcff}
+.result b{font-size:13px}.big{font-size:19px;font-weight:900;margin-top:6px}
+.add{color:#157443}.remove{color:#b42318}.move{color:#195b9f}
+.calcgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+footer{padding:10px 16px 24px;text-align:center;color:#7b8798;font-size:11px}
+.install-guide{margin:12px 0 14px;border:1px solid #d8e2ec;border-radius:14px;overflow:hidden;background:#fff}
+.install-guide img{display:block;width:100%;height:auto}.compact-guide svg{display:block;width:100%;height:auto;max-height:260px}
+.install-caption{padding:10px 12px;font-size:12px;line-height:1.5;color:#42526a;background:#f8fbff;border-top:1px solid #e4ebf2}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>ALIGNMENT MASTER</h1><p>A801 / A804 · Rim & Face Centering · v16</p></header>
+<main>
+
+<section id="menu" class="card">
+<h2>설비 목차</h2>
+<div class="small">설비별 도면치수와 계산상수를 저장해 사용하는 구조입니다.</div>
+<div class="menu">
+  <div><b>A801 감속기</b><br><span>8 Base · 도면 기준 등록</span></div>
+  <button class="primary" style="flex:0 0 95px" onclick="show('a801')">선택</button>
+</div>
+<div class="menu">
+  <div><b>A804 감속기</b><br><span>10 Base · 도면 기준 등록</span></div>
+  <button class="primary" style="flex:0 0 95px" onclick="show('a804')">선택</button>
+</div>
+</section>
+
+<section id="a801" class="card hidden">
+<h2>A801 감속기 · 최종 구성</h2>
+<div class="okbox"><b>A801 고정정보</b><br>
+베이스 8개 · 인풋측 홀수 1·3·5·7 · 아웃풋측 짝수 2·4·6·8 · 베이스열 간격 860 mm · 횡방향 피치 460 mm
+</div>
+<div class="note"><b>A801 확정 구조</b><br>
+도면값은 고정 적용하고, 작업자는 축간거리·FD 측정 원 직경·OD/FD 다이얼값만 입력합니다.
+</div>
+
+<div class="base-diagram" style="margin-top:12px">
+  <div class="dir"><span>← 아웃풋측 · 짝수</span><span>인풋측 · 홀수 →</span></div>
+  <div class="brow"><div class="base">2<small>아웃풋</small></div><div class="mid">1열</div><div class="base">1<small>인풋</small></div></div>
+  <div class="brow"><div class="base">4<small>아웃풋</small></div><div class="mid">460</div><div class="base">3<small>인풋</small></div></div>
+  <div class="brow"><div class="base">6<small>아웃풋</small></div><div class="mid">460</div><div class="base">5<small>인풋</small></div></div>
+  <div class="brow"><div class="base">8<small>아웃풋</small></div><div class="mid">460</div><div class="base">7<small>인풋</small></div></div>
+</div>
+
+<h3>현장 입력</h3>
+<label>유체커플링 취외 후 축간거리 (mm)</label>
+<input id="gap" type="number" step="1" placeholder="모터 OUT ↔ 감속기 IN">
+<div class="small">유체커플링을 취외한 상태에서 모터 아웃풋과 감속기 인풋 사이 실제 거리입니다.</div>
+
+<label>FD 측정 원 직경 Ø (mm)</label>
+<input id="dia" type="number" step="1" placeholder="예: Ø150이면 150 입력">
+<div class="note">Ø150이면 <b>150</b> 입력합니다. 축 중심에서 다이얼 접촉점까지 반경을 잰 경우에만 ×2 합니다.</div>
+
+<div class="btns">
+  <button class="secondary" onclick="show('menu')">목차</button>
+  <button class="primary" onclick="goOD()">OD 측정</button>
+</div>
+</section>
+
+
+<section id="a804" class="card hidden">
+<h2>A804 감속기</h2>
+<div class="okbox"><b>A804 고정정보</b><br>
+베이스 10개 · 인풋측 홀수 1·3·5·7·9 · 아웃풋측 짝수 2·4·6·8·10 · 베이스열 간격 900 mm · 행 피치 365 mm
+</div>
+
+<div class="base-diagram" style="margin-top:12px">
+  <div class="dir"><span>← 아웃풋측 · 짝수</span><span>인풋측 · 홀수 →</span></div>
+  <div class="brow"><div class="base">2<small>아웃풋</small></div><div class="mid">1열</div><div class="base">1<small>인풋</small></div></div>
+  <div class="brow"><div class="base">4<small>아웃풋</small></div><div class="mid">365</div><div class="base">3<small>인풋</small></div></div>
+  <div class="brow"><div class="base">6<small>아웃풋</small></div><div class="mid">365</div><div class="base">5<small>인풋</small></div></div>
+  <div class="brow"><div class="base">8<small>아웃풋</small></div><div class="mid">365</div><div class="base">7<small>인풋</small></div></div>
+  <div class="brow"><div class="base">10<small>아웃풋</small></div><div class="mid">365</div><div class="base">9<small>인풋</small></div></div>
+</div>
+
+<h3>현장 입력</h3>
+<label>유체커플링 취외 후 축간거리 (mm)</label>
+<input id="gap804" type="number" step="1" placeholder="모터 OUT ↔ 감속기 IN">
+<div class="small">유체커플링을 취외한 상태에서 모터 아웃풋과 감속기 인풋 사이 실제 거리입니다.</div>
+
+<label>FD 측정 원 직경 Ø (mm)</label>
+<input id="dia804" type="number" step="1" placeholder="예: Ø150이면 150 입력">
+<div class="note">Ø150이면 <b>150</b> 입력합니다. 축 중심에서 다이얼 접촉점까지 반경을 잰 경우에만 ×2 합니다.</div>
+
+<div class="note" style="margin-top:12px">
+<b>A804 계산 고정값</b><br>
+인풋↔아웃풋 베이스열 간격은 도면 기준 <b>900 mm</b>, 5개 행 피치는 <b>365 mm</b>로 고정 적용합니다.
+</div>
+
+<div class="btns">
+  <button class="secondary" onclick="show('menu')">목차</button>
+  <button class="primary" onclick="goOD804()">OD 측정</button>
+</div>
+</section>
+
+<section id="od" class="card hidden">
+<h2 id="odTitle">A801 · OD 측정</h2>
+<div class="small">12시 0 → 3시 → 6시 → 9시 → 12시 복귀. 시계방향으로 측정합니다.</div>
+<div class="dial">
+<div class="pos p12">12<br><span style="font-size:11px;color:#667085">상</span></div>
+<div class="pos p3">3<br><span style="font-size:11px;color:#667085">우</span></div>
+<div class="pos p6">6<br><span style="font-size:11px;color:#667085">하</span></div>
+<div class="pos p9">9<br><span style="font-size:11px;color:#667085">좌</span></div>
+<div class="center">OD<br>중심축</div>
+</div>
+
+<div class="install-guide compact-guide">
+<svg viewBox="0 0 520 250" role="img" aria-label="OD 다이얼 게이지 설치 방향">
+  <rect x="0" y="0" width="520" height="250" rx="16" fill="#f8fbff"/>
+  <text x="24" y="34" font-size="22" font-weight="800" fill="#0f477e">OD 측정 (RIM)</text>
+  <circle cx="320" cy="142" r="66" fill="#1f6b8b" stroke="#153650" stroke-width="4"/>
+  <line x1="386" y1="142" x2="480" y2="142" stroke="#60758b" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="205" cy="65" r="38" fill="#ffffff" stroke="#26364a" stroke-width="4"/>
+  <line x1="205" y1="27" x2="205" y2="102" stroke="#26364a" stroke-width="4"/>
+  <line x1="205" y1="103" x2="205" y2="128" stroke="#26364a" stroke-width="7"/>
+  <line x1="205" y1="128" x2="248" y2="128" stroke="#26364a" stroke-width="7"/>
+  <polygon points="248,116 272,128 248,140" fill="#195b9f"/>
+  <text x="35" y="92" font-size="16" font-weight="700" fill="#334155">다이얼 게이지</text>
+  <text x="292" y="225" font-size="16" font-weight="800" fill="#334155">팁 → 모터측 OD 외경(원주면)</text>
+</svg>
+<div class="install-caption"><b>OD 설치 방향</b> · 게이지 팁이 모터측 <b>OD 외경(원주면)</b>을 누르도록 설치</div>
+</div>
+
+<div class="grid">
+<div><label>12시 시작</label><input class="readonly" value="0.00" readonly></div>
+<div><label>3시</label><input id="od3" type="number" step="0.01"></div>
+<div><label>6시</label><input id="od6" type="number" step="0.01"></div>
+<div><label>9시</label><input id="od9" type="number" step="0.01"></div>
+</div>
+<label>12시 복귀</label><input id="od12" type="number" step="0.01">
+<div class="btns"><button class="secondary" onclick="show(activeEquip==='A801'?'a801':'a804')">이전</button><button class="primary" onclick="validateOD()">FD 측정</button></div>
+</section>
+
+<section id="fd" class="card hidden">
+<h2 id="fdTitle">A801 · FD 측정</h2>
+<div class="small">12시 0 → 3시 → 6시 → 9시 → 12시 복귀. OD와 동일하게 측정합니다.</div>
+<div class="dial">
+<div class="pos p12">12<br><span style="font-size:11px;color:#667085">상</span></div>
+<div class="pos p3">3<br><span style="font-size:11px;color:#667085">우</span></div>
+<div class="pos p6">6<br><span style="font-size:11px;color:#667085">하</span></div>
+<div class="pos p9">9<br><span style="font-size:11px;color:#667085">좌</span></div>
+<div class="center">FD<br>각도</div>
+</div>
+
+<div class="install-guide compact-guide">
+<svg viewBox="0 0 520 250" role="img" aria-label="FD 다이얼 게이지 설치 방향">
+  <rect x="0" y="0" width="520" height="250" rx="16" fill="#f8fbff"/>
+  <text x="24" y="34" font-size="22" font-weight="800" fill="#0f477e">FD 측정 (FACE)</text>
+  <ellipse cx="355" cy="140" rx="58" ry="72" fill="#1f6b8b" stroke="#153650" stroke-width="4"/>
+  <line x1="410" y1="140" x2="490" y2="140" stroke="#60758b" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="120" cy="140" r="38" fill="#ffffff" stroke="#26364a" stroke-width="4"/>
+  <line x1="158" y1="140" x2="244" y2="140" stroke="#26364a" stroke-width="7"/>
+  <polygon points="244,128 272,140 244,152" fill="#195b9f"/>
+  <line x1="272" y1="140" x2="295" y2="140" stroke="#195b9f" stroke-width="7"/>
+  <text x="56" y="78" font-size="16" font-weight="700" fill="#334155">다이얼 게이지</text>
+  <text x="285" y="225" font-size="16" font-weight="800" fill="#334155">팁 → 모터측 FACE 면에 직각</text>
+</svg>
+<div class="install-caption"><b>FD 설치 방향</b> · 게이지 팁이 모터측 <b>FACE 면을 직각으로</b> 누르도록 설치</div>
+</div>
+
+<div class="grid">
+<div><label>12시 시작</label><input class="readonly" value="0.00" readonly></div>
+<div><label>3시</label><input id="fd3" type="number" step="0.01"></div>
+<div><label>6시</label><input id="fd6" type="number" step="0.01"></div>
+<div><label>9시</label><input id="fd9" type="number" step="0.01"></div>
+</div>
+<label>12시 복귀</label><input id="fd12" type="number" step="0.01">
+<div class="btns"><button class="secondary" onclick="show('od')">이전</button><button class="primary" onclick="calc()">심 계산</button></div>
+</section>
+
+<section id="result" class="card hidden">
+<h2 id="resultTitle">A801 · 센터링 결과</h2>
+<div id="quality"></div>
+<div id="formula" class="note"></div>
+
+<h3>수직 심플레이트</h3>
+<div class="result"><b id="inLabel">인풋측 · 1·3·5·7번</b><div id="shimIn" class="big"></div></div>
+<div class="result"><b id="outLabel">아웃풋측 · 2·4·6·8번</b><div id="shimOut" class="big"></div></div>
+
+<h3>수평 이동</h3>
+<div class="result"><b>인풋측</b><div id="moveIn" class="big move"></div></div>
+<div class="result"><b>아웃풋측</b><div id="moveOut" class="big move"></div></div>
+
+<h3>계산 세부값</h3>
+<div class="calcgrid">
+<div class="const"><b>OD 수직편심</b><div id="vOff"></div></div>
+<div class="const"><b>OD 수평편심</b><div id="hOff"></div></div>
+<div class="const"><b>FD 수직기울기</b><div id="vSlope"></div></div>
+<div class="const"><b>FD 수평기울기</b><div id="hSlope"></div></div>
+</div>
+
+<div class="warnbox"><b>현장 검증형 계산</b><br>
+작업자 화면에서는 별도 베이스 중심거리 입력을 사용하지 않습니다.
+심 보정량은 <b>축간거리 + 선택 설비의 도면 고정 베이스열 간격</b> 기준으로 계산합니다.
+첫 실제 센터링에서 +/− 방향과 계산값을 반드시 대조해 최종 고정합니다.
+</div>
+
+<div class="btns"><button class="secondary" onclick="show(activeEquip==='A801'?'a801':'a804')">설비 처음</button></div>
+</section>
+
+</main>
+<footer>Alignment Master v9 · A801 Field Build</footer>
+</div>
+
+<script>
+const pages=['menu','a801','a804','od','fd','result'];
+let activeEquip='A801';
+let ACTIVE_BASE_SPAN=860;
+const RETURN_TOL=0.05, CLOSURE_TOL=0.05;
+
+function show(id){pages.forEach(p=>document.getElementById(p).classList.toggle('hidden',p!==id));window.scrollTo({top:0,behavior:'smooth'})}
+function n(id){const v=document.getElementById(id).value;return v===''?NaN:Number(v)}
+function vals(prefix){return [n(prefix+'3'),n(prefix+'6'),n(prefix+'9'),n(prefix+'12')]}
+
+function setActive(equip){
+  activeEquip=equip;
+  if(equip==='A801'){
+    ACTIVE_BASE_SPAN=860;
+    document.getElementById('odTitle').textContent='A801 · OD 측정';
+    document.getElementById('fdTitle').textContent='A801 · FD 측정';
+    document.getElementById('resultTitle').textContent='A801 · 센터링 결과';
+    document.getElementById('inLabel').textContent='인풋측 · 1·3·5·7번';
+    document.getElementById('outLabel').textContent='아웃풋측 · 2·4·6·8번';
+  } else {
+    ACTIVE_BASE_SPAN=900;
+    document.getElementById('odTitle').textContent='A804 · OD 측정';
+    document.getElementById('fdTitle').textContent='A804 · FD 측정';
+    document.getElementById('resultTitle').textContent='A804 · 센터링 결과';
+    document.getElementById('inLabel').textContent='인풋측 · 1·3·5·7·9번';
+    document.getElementById('outLabel').textContent='아웃풋측 · 2·4·6·8·10번';
+  }
+}
+function goOD(){
+ setActive('A801');
+ const gap=n('gap'),dia=n('dia');
+ if(!(gap>0)){alert('축간거리를 입력해 주세요.');return}
+ if(!(dia>0)){alert('FD 측정 원 직경 Ø를 입력해 주세요.');return}
+ show('od');
+}
+function goOD804(){
+ setActive('A804');
+ const gap=n('gap804'),dia=n('dia804');
+ if(!(gap>0)){alert('축간거리를 입력해 주세요.');return}
+ if(!(dia>0)){alert('FD 측정 원 직경 Ø를 입력해 주세요.');return}
+ show('od');
+}
+function validateOD(){
+ const od=vals('od');
+ if(od.some(Number.isNaN)){alert('OD 값을 모두 입력해 주세요.');return}
+ if(Math.abs(od[3])>RETURN_TOL){alert('OD 12시 복귀오차가 ±0.05 mm를 초과했습니다. 재측정해 주세요.');return}
+ show('fd');
+}
+function action(v){
+ const a=Math.abs(v);
+ if(a<0.005)return '<span>조정 없음 · 0.00 mm</span>';
+ return v>0?`<span class="add">심 ${a.toFixed(2)} mm 추가</span>`:`<span class="remove">심 ${a.toFixed(2)} mm 제거</span>`;
+}
+function movement(v){
+ const a=Math.abs(v);
+ if(a<0.005)return '조정 없음 · 0.00 mm';
+ return v>0?`우측 ${a.toFixed(2)} mm 이동`:`좌측 ${a.toFixed(2)} mm 이동`;
+}
+function calc(){
+ const gap=activeEquip==='A801'?n('gap'):n('gap804');
+ const dia=activeEquip==='A801'?n('dia'):n('dia804');
+ const od=vals('od'),fd=vals('fd');
+ if(fd.some(Number.isNaN)){alert('FD 값을 모두 입력해 주세요.');return}
+ if(Math.abs(fd[3])>RETURN_TOL){alert('FD 12시 복귀오차가 ±0.05 mm를 초과했습니다. 재측정해 주세요.');return}
+
+ const xIn=gap;
+ const xOut=gap+ACTIVE_BASE_SPAN;
+
+ const vOffset=od[1]/2;
+ const hOffset=(od[0]-od[2])/2;
+
+ const vSlope=fd[1]/dia;
+ const hSlope=(fd[0]-fd[2])/dia;
+
+ const vIn=-(vOffset+vSlope*xIn);
+ const vOut=-(vOffset+vSlope*xOut);
+ const hIn=-(hOffset+hSlope*xIn);
+ const hOut=-(hOffset+hSlope*xOut);
+
+ const odClosure=Math.abs(od[1]-(od[0]+od[2]));
+ const fdClosure=Math.abs(fd[1]-(fd[0]+fd[2]));
+ const qOK=odClosure<=CLOSURE_TOL && fdClosure<=CLOSURE_TOL;
+
+ document.getElementById('quality').className=qOK?'okbox':'warnbox';
+ document.getElementById('quality').innerHTML=
+ `<b>${qOK?'측정 일관성 양호':'측정값 일관성 확인 필요'}</b><br>`+
+ `OD 4점 폐합오차 ${odClosure.toFixed(2)} mm / FD 4점 폐합오차 ${fdClosure.toFixed(2)} mm`;
+
+ document.getElementById('formula').innerHTML=
+ `축간거리 = <b>${gap.toFixed(0)} mm</b><br>`+
+ `FD 측정 원 = <b>Ø${dia.toFixed(0)} mm</b><br>`+
+ `인풋측 계산거리 = <b>${xIn.toFixed(0)} mm</b><br>`+
+ `아웃풋측 계산거리 = ${xIn.toFixed(0)} + ${ACTIVE_BASE_SPAN.toFixed(0)} = <b>${xOut.toFixed(0)} mm</b>`;
+
+ document.getElementById('shimIn').innerHTML=action(vIn);
+ document.getElementById('shimOut').innerHTML=action(vOut);
+ document.getElementById('moveIn').textContent=movement(hIn);
+ document.getElementById('moveOut').textContent=movement(hOut);
+
+ document.getElementById('vOff').textContent=(vOffset>=0?'+':'')+vOffset.toFixed(3)+' mm';
+ document.getElementById('hOff').textContent=(hOffset>=0?'+':'')+hOffset.toFixed(3)+' mm';
+ document.getElementById('vSlope').textContent=(vSlope>=0?'+':'')+vSlope.toFixed(6);
+ document.getElementById('hSlope').textContent=(hSlope>=0?'+':'')+hSlope.toFixed(6);
+
+ show('result');
+}
+</script>
+</body>
+</html>
